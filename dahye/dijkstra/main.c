@@ -1,13 +1,18 @@
 /*
 출발점으로 부터 모든노드의 최단거리
 다익스트라 인접리스트로 미로찾기 최단거리 구함!
-최단거리만 구한것이다. 찾아가는 과정은 구현하지 않음..!ㅠㅡㅠ
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include "color.h"
 #define MAX 8
+#define PATH 0
+#define WALL 1
+#define VISITED 2
+#define FINAL 3
+#define EDGE 4
 
 int maze[MAX+2][MAX+2]={
     {4,4,4,4,4,4,4,4,4,4},
@@ -22,6 +27,9 @@ int maze[MAX+2][MAX+2]={
     {4,4,4,4,4,4,4,4,4,4}
 };
 int parent[100];
+int end, start;
+
+void print_maze(int x, int y);
 typedef struct node{
     int dest;       //목적노드
     int weight;     //가중치
@@ -159,11 +167,25 @@ int is_min(Heap * h, int v){
     if(h->pos[v] < h->size) return 1;
     else return 0;
 }
-void print_path(int parent[], int j){
-    for(int i=0;i<100;i++)
-        printf("%d \n",parent[i]);
-}
 
+void backtracking(int end){
+    int i, j, back;
+    int m = MAX+2;
+    back = end;
+    i  = end / m;
+    j  = end % m;
+    
+    while( parent[back] != -1)
+    {
+        back = parent[back];
+        
+        maze[i][j] = FINAL;
+        
+        i  = back / 10;
+        j  = back % 10;
+    }
+    maze[1][1] = FINAL;
+}
 
 void print_array(int dis[],int n,int parent[]){
     printf("정점\t\t시작노드로부터거리\n");
@@ -171,7 +193,6 @@ void print_array(int dis[],int n,int parent[]){
     for(int i=0;i<n;i++){
         if(i==e)printf("도착지!!\n");
         printf("%d\t\t\t%d\n",i,dis[i]);
-//        print_path(parent, i);
     }
     
 }
@@ -206,6 +227,9 @@ void dijkstra(Graph * g,int src){
             
             if(is_min(heap, v)&&dis[u]!=INT_MAX && trav->weight+dis[u]<dis[v]){
                 dis[v] = dis[u] + trav->weight;
+                parent[v]=u;
+                maze[u/(MAX+2)][u%(MAX+2)]=VISITED;
+                print_maze(u/(MAX+2), u%(MAX+2));
                 decrease_key(heap,v,dis[v]);
             }
             trav=trav->next;
@@ -213,33 +237,91 @@ void dijkstra(Graph * g,int src){
     }
     print_array(dis, V, parent);
 }
+void print_maze(int x,int y){
+    // sleep(1);
+    // clear();
+    
+    for(int i=0;i<MAX+2;i++){
+        for(int j=0;j<MAX+2;j++){
+            switch (maze[i][j]) {
+                case 0:
+                    printf(BLACK);
+                    if(i==x&&j==y){
+                        printf(BOLDRED);
+                    }
+                    
+                    printf("[]");
+                    printf(RESET);
+                    break;
+                case 1:
+                    if(i==x&&j==y){
+                        printf(BOLDRED);
+                    }
+                    printf("[]");
+                    break;
+                case 3:
+                    printf(BOLDGREEN);
+                    printf("[]");
+                    printf(RESET);
+                    break;
+                    
+                case 4:
+                    printf(BOLDBLUE);
+                    if(i==x&&j==y){
+                        printf(BOLDRED);
+                        printf("[]");
+                    }else
+                        printf("[]");
+                    printf(RESET);
+                    break;
+                default:
+                    printf(BOLDYELLOW);
+                    if(i==x&&j==y){
+                        printf(BOLDRED);
+                    }
+                    printf("[]");
+                    printf(RESET);
+                    break;
+                    
+                    break;
+            }
+            printf(RESET);
+            if(j==MAX+1)printf("\n");
+        }
+    }
+    printf(RESET);
+}
+
 int main()
 {
     // create the graph given in above fugure
+    
     int m = MAX+2, s;
     Graph * graph = create_graph(m*m);
     
-    
-    parent[m*1+1]=-1;
+    start = m*1+1;
+    end = m*8+8;
+    parent[start] = -1;
     for(int i=1;i<m-1;i++){
         for(int j=1;j<m-1;j++){
             s=i*m+j;
-            if(i==1 && maze[i+1][j]==0)add_edge(graph, s, s+m, 1);
-            if(j==1&&maze[i][j+1]==0)add_edge(graph, s, s+1, 1);
+            if(i==1 && maze[i+1][j]==PATH)add_edge(graph, s, s+m, 1);
+            if(j==1&&maze[i][j+1]==PATH)add_edge(graph, s, s+1, 1);
                 
-            if(i==m-2&&maze[i-1][j]==0)add_edge(graph, s,s-m,1);
+            if(i==m-2&&maze[i-1][j]==PATH)add_edge(graph, s,s-m,1);
             if(j==m-2&&maze[i][j-1]==0)add_edge(graph, s, s-1, 1);
             if(i!=1&&j!=1&&j!=m-2&&i!=m-2){
-                if(maze[i+1][j]==0)add_edge(graph, s, s+m, 1);
-                if(maze[i-1][j]==0)add_edge(graph, s, s-m, 1);
-                if(maze[i][j+1]==0)add_edge(graph, s, s+1, 1);
-                if(maze[i][j-1]==0)add_edge(graph, s, s-1, 1);
+                if(maze[i+1][j]==PATH)add_edge(graph, s, s+m, 1);
+                if(maze[i-1][j]==PATH)add_edge(graph, s, s-m, 1);
+                if(maze[i][j+1]==PATH)add_edge(graph, s, s+1, 1);
+                if(maze[i][j-1]==PATH)add_edge(graph, s, s-1, 1);
                 
             }
         }
     }
-    dijkstra(graph, 11);
-    
+    dijkstra(graph, start);
+    backtracking(end);
+    print_maze(end/m, end%m);
     
     return 0;
 }
