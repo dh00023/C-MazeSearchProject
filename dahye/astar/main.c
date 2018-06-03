@@ -15,7 +15,6 @@ int maze[MAX+2][MAX+2]= {
     { 4, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 4 },
     { 4, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
     { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
-    
 };
 Vertex start,end;
 
@@ -101,7 +100,6 @@ void astar(Vertex s,Vertex e){
     
     while(!is_empty(q)){
         
-        
         // 현재 점을 Closed list에 추가 >> maze에 바로표시
         maze[v.x][v.y]=CLOSED;
         v = front(q);
@@ -125,6 +123,11 @@ void print_weight(){
 }
 void backtracking(){
     int i, j, back;
+
+    if(parent[end.x][end.y]==0){
+        printf("경로가 없습니다.\n");
+        return;
+    }
     
     i  = parent[end.x][end.y] / 10;
     j  = parent[end.x][end.y] % 10;
@@ -196,10 +199,9 @@ void print_maze(int x,int y){
 }
 int main(){
     start.x=1;start.y=1;
-    end.x=1;end.y=MAX;
+    end.x=1;end.y=10;
     astar(start, end);
     print_weight();
-    print_maze(end.x,end.y);
     backtracking();
     print_maze(end.x,end.y);
 }
