@@ -1,19 +1,21 @@
 #include "main_h.h"
 #include "color.h"
-
+#include <unistd.h>
+#define clear() printf("\033[H\033[J")
 int maze[MAX+2][MAX+2]= {
-    {4,4,4,4,4,4,4,4,4,4,4,4},
-    {4,0,0,0,0,0,0,0,0,0,1,4},
-    {4,0,1,1,0,1,1,0,1,1,1,4},
-    {4,0,0,1,0,1,0,0,0,0,1,4},
-    {4,0,1,0,1,0,1,1,1,0,0,4},
-    {4,0,0,0,1,0,1,0,0,1,0,4},
-    {4,0,1,0,1,0,0,0,1,1,0,4},
-    {4,0,1,1,1,0,1,0,0,1,1,4},
-    {4,0,1,0,0,0,1,1,1,0,1,4},
-    {4,0,0,0,1,0,0,0,1,0,1,4},
-    {4,0,1,1,1,0,1,0,0,0,0,4},
-    {4,4,4,4,4,4,4,4,4,4,4,4}
+    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+    { 4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4 },
+    { 4, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 4 },
+    { 4, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 4 },
+    { 4, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 4 },
+    { 4, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 4 },
+    { 4, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
+    { 4, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 4 },
+    { 4, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 4 },
+    { 4, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 4 },
+    { 4, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
+    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+    
 };
 Vertex start,end;
 
@@ -49,13 +51,14 @@ void add_openlist(Queue * q,Vertex v){
         
         if(i<1||i>MAX)continue;             // 범위를 벗어나면 통과한다.
         for(j=v.y-1;j<=v.y+1;j++){
+            
             if(j<1||j>MAX)continue;         // 범위를 벗어나면 통과한다.
             if(i==v.x&&j==v.y)continue;     // i와 j가 현재 노드랑 같으면 통과
             if(maze[i][j]!=0)continue;      // 길이 아니면 통과
             
             // 가중치 f(x)
             w = heuristic(v, i, j, &pre);
-            
+            // printf("i : %d j: %d\n",i,j );
             // 가중치가 현재보다 낮거나 기록이 안되어있으면 갱신
             if(w<weight[i][j]||weight[i][j]==0){
                 weight[i][j]=w;
@@ -63,9 +66,12 @@ void add_openlist(Queue * q,Vertex v){
                 parent[i][j] = (v.x*MAX)+v.y;
                 
                 // 출구를 찾으면 종료
-                if(end.x == i && end.y ==j)return;
-                
+                if(i==end.x && j==end.y ){
+                    printf("1.출구를 찾음\n");
+                    return;
+                }
             }
+            print_maze(i,j);
             tmp.x = i;
             tmp.y = j;
             tmp.g_x = pre;
@@ -95,12 +101,12 @@ void astar(Vertex s,Vertex e){
     
     while(!is_empty(q)){
         
+        
         // 현재 점을 Closed list에 추가 >> maze에 바로표시
         maze[v.x][v.y]=CLOSED;
-        print_maze(v.x,v.y);
-        
         v = front(q);
         deQueue(q);
+        if(v.x==end.x && v.y==end.y)return;
         
         // 새로운 인접노드를 추가해준다.
         add_openlist(q, v);
@@ -135,6 +141,9 @@ void backtracking(){
     maze[start.x][start.y] = FINAL;
 }
 void print_maze(int x,int y){
+    // sleep(1);
+    // clear();
+
     for(int i=0;i<MAX+2;i++){
         for(int j=0;j<MAX+2;j++){
             switch (maze[i][j]) {
@@ -187,7 +196,7 @@ void print_maze(int x,int y){
 }
 int main(){
     start.x=1;start.y=1;
-    end.x=MAX;end.y=MAX;
+    end.x=1;end.y=MAX;
     astar(start, end);
     print_weight();
     print_maze(end.x,end.y);
@@ -242,8 +251,8 @@ void enQueue(Queue * q,Vertex v){
         key = weight[v.x][v.y];
         
         if( key < weight[tq->ver.x][tq->ver.y]){
-            tmp = q->rear->ver;
-            q->rear->ver = v;
+            tmp = tq->ver;
+            tq->ver = v;
             v  = tmp;
         }
         tq = tq->next;

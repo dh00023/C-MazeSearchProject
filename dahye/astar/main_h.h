@@ -43,6 +43,7 @@ QNode * new_node(Vertex v);
 Queue * creat_queue(void);
 
 void print_maze(int x, int y);
+void print_weight();
 int weight[MAX+2][MAX+2];
 int parent[MAX+2][MAX+2];
 #endif /* main_h_h */
