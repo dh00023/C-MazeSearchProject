@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include "color.h"
-#define MAX 8
+#define MAX 10
 #define PATH 0
 #define WALL 1
 #define VISITED 2
@@ -15,19 +15,21 @@
 #define EDGE 4
 
 int maze[MAX+2][MAX+2]={
-    {4,4,4,4,4,4,4,4,4,4},
-    {4,0,0,0,0,0,0,0,1,4},
-    {4,0,1,1,0,1,1,0,1,4},
-    {4,0,0,0,1,0,0,0,1,4},
-    {4,0,1,0,0,1,1,0,0,4},
-    {4,0,1,1,1,0,0,1,1,4},
-    {4,0,1,0,0,0,1,0,1,4},
-    {4,0,0,0,1,0,0,0,1,4},
-    {4,0,1,1,1,0,1,0,0,4},
-    {4,4,4,4,4,4,4,4,4,4}
+    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+    { 4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4 },
+    { 4, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 4 },
+    { 4, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 4 },
+    { 4, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 4 },
+    { 4, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 4 },
+    { 4, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
+    { 4, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 4 },
+    { 4, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 4 },
+    { 4, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 4 },
+    { 4, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
+    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+
 };
 int parent[100];
-int end, start;
 
 void print_maze(int x, int y);
 typedef struct node{
@@ -168,32 +170,28 @@ int is_min(Heap * h, int v){
     else return 0;
 }
 
-void backtracking(int end){
+void backtracking(int end,int n){
     int i, j, back;
-    int m = MAX+2;
     back = end;
-    i  = end / m;
-    j  = end % m;
-    
+    if(parent[back]==0){
+        printf("경로가 없습니다.\n");
+        return;
+    }
     while( parent[back] != -1)
     {
-        back = parent[back];
-        
+        i  = back / n;
+        j  = back % n;
         maze[i][j] = FINAL;
-        
-        i  = back / 10;
-        j  = back % 10;
+        back = parent[back];
     }
     maze[1][1] = FINAL;
 }
 
 void print_array(int dis[],int n){
     printf("정점\t\t시작노드로부터거리\n");
-    int e = 88;
-    for(int i=0;i<n;i++){
-        if(i==e)printf("도착지!!\n");
+    for(int i=0;i<n;i++)
         printf("%d\t\t\t%d\n",i,dis[i]);
-    }
+
     
 }
 
@@ -224,11 +222,10 @@ void dijkstra(Graph * g,int src){
         Node * trav = g->array[u].head;
         while(trav!=NULL){
             int v = trav->dest;
-            
+            maze[v/(MAX+2)][v%(MAX+2)]=VISITED;    
             if(is_min(heap, v)&&dis[u]!=INT_MAX && trav->weight+dis[u]<dis[v]){
                 dis[v] = dis[u] + trav->weight;
                 parent[v]=u;
-                maze[u/(MAX+2)][u%(MAX+2)]=VISITED;
                 print_maze(u/(MAX+2), u%(MAX+2));
                 decrease_key(heap,v,dis[v]);
             }
@@ -261,6 +258,10 @@ void print_maze(int x,int y){
                     break;
                 case 3:
                     printf(BOLDGREEN);
+                    
+                    if(i==x&&j==y){
+                        printf(BOLDRED);
+                    }
                     printf("[]");
                     printf(RESET);
                     break;
@@ -299,8 +300,8 @@ int main()
     int m = MAX+2, s;
     Graph * graph = create_graph(m*m);
     
-    start = m*1+1;
-    end = m*8+8;
+    int start = m*1+1;
+    int end = m*6+6;
     
     parent[start] = -1;
     for(int i=1;i<m-1;i++){
@@ -350,8 +351,8 @@ int main()
         }
     }
     print_maze(start/m, start%m);
-    dijkstra(graph, 11);
-    backtracking(end);
+    dijkstra(graph, start);
+    backtracking(end,m);
     print_maze(end/m, end%m);
     
     return 0;

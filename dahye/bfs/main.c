@@ -14,28 +14,31 @@
 #define MAX 10
 #define PATH 0              // 지나갈 수 있는 길
 #define WALL 1              // 지나갈 수 없는 길 == 벽 흰색!
-#define FINAL 2
+#define FINAL 3
 #define EDGE 4              // 테두리
 #define clear() printf("\033[H\033[J")
 
 
 int maze[MAX+2][MAX+2]= {
-    {4,4,4,4,4,4,4,4,4,4,4,4},
-    {4,0,0,0,0,0,0,0,0,0,1,4},
-    {4,0,1,1,0,1,1,0,1,1,1,4},
-    {4,0,0,1,0,1,0,0,0,0,1,4},
-    {4,0,1,0,1,0,1,1,1,0,0,4},
-    {4,0,0,0,1,0,1,0,0,1,0,4},
-    {4,0,1,0,1,0,0,0,1,1,0,4},
-    {4,0,1,1,1,0,1,0,0,1,1,4},
-    {4,0,1,0,0,0,1,1,1,0,1,4},
-    {4,0,0,0,1,0,0,0,1,0,1,4},
-    {4,0,1,1,1,0,1,0,0,0,0,4},
-    {4,4,4,4,4,4,4,4,4,4,4,4}
+    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+
+
+
 };
 
 void print_maze(int x, int y);
-void final_path(Position pos);
+void final_path(Position pos,Position start);
 int movable(Position pos,int dir);
 int n = MAX+2;
 
@@ -47,12 +50,16 @@ int main(int argc, const char * argv[]) {
     Position cur;
     cur.x=1;
     cur.y=1;
-
+    Position end,start;
+    start.x=1;
+    start.y=1;
+    end.x=6;
+    end.y=6;
     
    enQueue(q,cur);
 
    // 추가 배열을 사용하지 않기 위해 방문 표시를 음수로 저장
-   maze[1][1]=-1;
+   maze[start.x][start.y]=-1;
    int found = 0;
 
    while(!is_empty(q)){
@@ -66,16 +73,22 @@ int main(int argc, const char * argv[]) {
                // 추가 배열을 사용하지 않기 위해 방문 표시를 음수로 저장
                maze[pos.x][pos.y] = maze[cur.x][cur.y]-1;
 
-               if(pos.x==MAX&&pos.y==MAX){
+               if(pos.x==end.x&&pos.y==end.y){
                    printf("미로를 찾았습니다.\n");
-                   final_path(pos);
-                   found=1;
+                   final_path(pos,start);
+                   print_maze(end.x, end.y);
                    exit(0);
                }
                enQueue(q,pos);
            }
        }
    }
+   if(is_empty(q)){
+        printf("경로가없습니다.\n");
+        exit(0);
+    }
+    
+
 
     return 0;
 }
@@ -164,7 +177,7 @@ void print_maze(int x,int y){
     printf(RESET);
 }
 
-void final_path(Position pos){
+void final_path(Position pos,Position start){
     
     Position cur = pos;
     Position next;
@@ -183,8 +196,8 @@ void final_path(Position pos){
                 break;
             }
         }
-        if(cur.x==1&&cur.y==1)break;
+        if(cur.x==start.x&&cur.y==start.y)break;
     }
-    print_maze(n-2, n-2);
+    
 }
 

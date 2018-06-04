@@ -1,43 +1,50 @@
 #include "stack.h"
-#include "queue.h"
 #include "position.h"
 #include "color.h"
 #include <unistd.h>
 
-#define MAX 8
+#define MAX 10
 #define PATH 0              // 지나갈 수 있는 길
 #define WALL 1              // 지나갈 수 없는 길 == 벽 흰색!
-#define VISITED 2           // 이미 방문한 위치(DFS) , 최종경로(BFS)
-#define BACKTRACKED 3       // 방문했다 되돌아 나온 위치
+#define VISITED 3           // 이미 방문한 위치(DFS) , 최종경로(BFS)
+#define BACKTRACKED 2       // 방문했다 되돌아 나온 위치
 #define EDGE 4              // 테두리
 #define clear() printf("\033[H\033[J")
 
 int maze[MAX+2][MAX+2]={
-    {4,4,4,4,4,4,4,4,4,4},
-    {4,0,0,0,0,0,0,0,1,4},
-    {4,0,1,1,0,1,1,0,1,4},
-    {4,0,0,0,1,0,0,0,1,4},
-    {4,0,1,0,0,1,1,0,0,4},
-    {4,0,1,1,1,0,0,1,1,4},
-    {4,0,1,0,0,0,1,0,1,4},
-    {4,0,0,0,1,0,0,0,1,4},
-    {4,0,1,1,1,0,1,0,0,4},
-    {4,4,4,4,4,4,4,4,4,4}
+    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+{ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+
+
+
+
 };
 int n=MAX+2; // 미로의 크기
 void print_maze(int x, int y);
 int movable(Position pos,int dir);
 void final_path(Position pos);
-void dfs(int maze[][n],Position start);
+void dfs(int maze[][n],Position start,Position end);
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     
-    Position start;
+    Position start,end;
     start.x=1;
     start.y=1;
+    end.x = 6;
+    end.y = 6;
 
-   dfs(maze, start);
+   dfs(maze, start,end);
     
     return 0;
 }
@@ -119,7 +126,7 @@ void print_maze(int x,int y){
         printf(RESET);
     }
 }
-void dfs(int maze[][n],Position start){
+void dfs(int maze[][n],Position start,Position end){
     Stack * top;
     init(&top); // 이동할 방향의 정수를 저장한다.
     
@@ -130,7 +137,7 @@ void dfs(int maze[][n],Position start){
     
     while(1){
         maze[cur.x][cur.y] = VISITED;
-        if(cur.x == MAX && cur.y == MAX){
+        if(cur.x == end.x && cur.y == end.y){
             print_maze(cur.x,cur.y);
             printf("미로를 찾았습니다!\n");
             break;
