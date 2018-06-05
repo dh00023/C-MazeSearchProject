@@ -1,24 +1,22 @@
-#pragma once
 #include <stdlib.h>
-#include "point.h"
+#include "position.h"
 
-typedef struct stackNode {
+#define stack_h
 
-	element data;
-	struct stackNode *link;
+#include <stdio.h>
+#include <stdlib.h>
+#include "position.h"
 
-}StackNode;
 
-typedef struct stackType {
+typedef struct stack {
+	Position pos;
+	struct stack * next;
+}Stack;
 
-	StackNode *top;
+Stack * new_stack_node(Position pos);
+void init(Stack **s);
+int is_empty_stack(Stack *s);
+Position peek(Stack *s);
+void push(Stack * top, Position pos);
+void pop(Stack *s);
 
-}StackType;
-
-StackType *makeStack();
-StackNode *makeStackNode();
-void initStack(StackType **s);
-int isEmptyStack(StackType *s);
-void push(StackType *s, element data);
-element pop(StackType *s);
-element peek(StackType *s);

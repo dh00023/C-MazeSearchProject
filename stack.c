@@ -1,54 +1,42 @@
 #include "stack.h"
 
-StackType *makeStack() { //스택 생성
-	return (StackType *)calloc(1, sizeof(StackType));
+Stack * new_stack_node(Position pos) {
+	Stack * new = (Stack *)malloc(sizeof(Stack));
+	new->pos = pos;
+	new->next = NULL;
+	return new;
 }
-
-StackNode *makeStackNode() { //스택노드 생성
-	return (StackNode *)calloc(1, sizeof(StackNode));
-}
-
-void initStack(StackType **s) { //스택 초기화
+void init(Stack **s) {
 	free(*s);
-	*s = NULL;
+	*s = NULL; 
+
 }
-
-int isEmptyStack(StackType *s) { //스택이 비어있는지 확인
-	return (s->top == NULL);
+int is_empty_stack(Stack *s) {
+	
+	return (s == NULL);
 }
+Position peek(Stack *s) {
+	if (is_empty_stack(s))
+		return;
+	return s->pos;
+}
+void push(Stack * top, Position pos) {
+	Stack * new = NULL;
+	if (is_empty_stack(top)) {
+		new = new_stack_node(pos);
+	}
+	else {
+		new = new_stack_node(pos);
+		new->next = top;
+	}
+	top = new;
+}
+void pop(Stack * top) {
+	Stack * p = top;
 
-void push(StackType *s, element data) { //스택의 data를 push
-
-	StackNode *node = makeStackNode();
-
-	if (node == NULL)
+	if (is_empty_stack(top))
 		return;
 
-	node->data = data;
-	node->link = s->top;
-	s->top = node;
-}
-
-element pop(StackType *s) { //스택의 data를 pop
-
-	StackNode *tempStackNode = makeStackNode();
-	element data;
-
-	if (isEmptyStack(s))
-		return;
-
-	tempStackNode = s->top;
-	data = tempStackNode->data;
-	s->top = tempStackNode->link;
-	free(tempStackNode);
-
-	return data;
-}
-
-element peek(StackType *s) { //스택의 data를 peek
-
-	if (isEmptyStack(s))
-		return;
-
-	return s->top->data;
+	top = p->next;
+	free(p);
 }
