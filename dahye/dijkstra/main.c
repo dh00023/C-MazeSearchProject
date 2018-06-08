@@ -15,19 +15,18 @@
 #define EDGE 4
 
 int maze[MAX+2][MAX+2]={
-    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
-    { 4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4 },
-    { 4, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 4 },
-    { 4, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 4 },
-    { 4, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 4 },
-    { 4, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 4 },
-    { 4, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
-    { 4, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 4 },
-    { 4, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 4 },
-    { 4, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 4 },
-    { 4, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 4 },
-    { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
-
+    {4,4,4,4,4,4,4,4,4,4,4,4},
+    {4,0,0,0,0,0,0,0,0,0,1,4},
+    {4,0,1,1,0,1,1,0,1,1,1,4},
+    {4,0,0,1,0,1,0,0,0,0,1,4},
+    {4,0,1,0,1,0,1,1,1,0,0,4},
+    {4,0,0,0,1,0,1,0,0,1,0,4},
+    {4,0,1,0,1,0,0,0,1,1,0,4},
+    {4,0,1,1,1,0,1,0,0,1,1,4},
+    {4,0,1,0,0,0,1,1,1,0,1,4},
+    {4,0,0,0,1,0,0,0,1,0,1,4},
+    {4,0,1,1,1,0,1,0,0,0,0,4},
+    {4,4,4,4,4,4,4,4,4,4,4,4}
 };
 int parent[100];
 
@@ -211,6 +210,7 @@ void dijkstra(Graph * g,int src){
     heap->array[src]=new_hnode(src, dis[src]);
     heap->pos[src]=src;
     dis[src]=0;
+    maze[src/(MAX+2)][src%(MAX+2)]=VISITED;
     decrease_key(heap,src,dis[src]);
     
     heap->size=V;
@@ -218,12 +218,11 @@ void dijkstra(Graph * g,int src){
     while(!is_empty(heap)){
         HNode * min = delete(heap);
         int u = min->v;
-        
         Node * trav = g->array[u].head;
         while(trav!=NULL){
             int v = trav->dest;
-            maze[v/(MAX+2)][v%(MAX+2)]=VISITED;    
             if(is_min(heap, v)&&dis[u]!=INT_MAX && trav->weight+dis[u]<dis[v]){
+                
                 dis[v] = dis[u] + trav->weight;
                 parent[v]=u;
                 print_maze(u/(MAX+2), u%(MAX+2));
@@ -301,7 +300,7 @@ int main()
     Graph * graph = create_graph(m*m);
     
     int start = m*1+1;
-    int end = m*6+6;
+    int end = m*10+10;
     
     parent[start] = -1;
     for(int i=1;i<m-1;i++){

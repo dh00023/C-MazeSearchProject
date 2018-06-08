@@ -31,7 +31,10 @@ int maze[MAX+2][MAX+2]= {
     {4,4,4,4,4,4,4,4,4,4,4,4}
 };
 
+void print_maze(int x, int y);
+
 int find_path(int x, int y){
+    print_maze(x,y);
     if(x<1 ||y<1||x>MAX||y>MAX)return 0;
     else if(maze[x][y] != PATH)return 0;
     else if(x==MAX&&y==MAX){
@@ -39,6 +42,7 @@ int find_path(int x, int y){
         return 1;
     }else{
         maze[x][y] = VISITED;
+        // 북동남서 순으로 길을 갈 수 있으면 순환!
         if(find_path(x-1, y)||find_path(x, y+1)||find_path(x+1, y)||find_path(x, y-1)) return 1;
         maze[x][y]=BLOCKED;
         return 0;

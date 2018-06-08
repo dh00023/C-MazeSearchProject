@@ -2,6 +2,8 @@
 #include "color.h"
 #include <unistd.h>
 #define clear() printf("\033[H\033[J")
+
+
 int maze[MAX+2][MAX+2]= {
     { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
     { 4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4 },
@@ -17,7 +19,7 @@ int maze[MAX+2][MAX+2]= {
     { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
 };
 Vertex start,end;
-
+int n = MAX+2;
 // heuristic함수로 가중치를 계산하는 함수
 // 여기서 pre는 이전정점의 gx값을 받아온다.
 int heuristic(Vertex v, int x,int y, int *pre){
@@ -62,7 +64,7 @@ void add_openlist(Queue * q,Vertex v){
             if(w<weight[i][j]||weight[i][j]==0){
                 weight[i][j]=w;
                 // 부모 노드의 정보를 저장한다.
-                parent[i][j] = (v.x*MAX)+v.y;
+                parent[i][j] = (v.x*n)+v.y;
                 
                 // 출구를 찾으면 종료
                 if(i==end.x && j==end.y ){
@@ -114,8 +116,8 @@ void astar(Vertex s,Vertex e){
 }
 void print_weight(){
     int i,j;
-    for(i=0;i<MAX+2;i++){
-        for(j=0;j<MAX+2;j++)
+    for(i=0;i<n;i++){
+        for(j=0;j<n;j++)
             printf("%6d",weight[i][j]);
         printf("\n");
     }
@@ -129,8 +131,8 @@ void backtracking(){
         return;
     }
     
-    i  = parent[end.x][end.y] / 10;
-    j  = parent[end.x][end.y] % 10;
+    i  = parent[end.x][end.y] / n;
+    j  = parent[end.x][end.y] % n;
     
     while( parent[i][j] != -1)
     {
@@ -138,8 +140,8 @@ void backtracking(){
         
         maze[i][j] = FINAL;
         
-        i  = back / 10;
-        j  = back % 10;
+        i  = back / n;
+        j  = back % n;
     }
     maze[start.x][start.y] = FINAL;
 }
@@ -147,8 +149,8 @@ void print_maze(int x,int y){
     // sleep(1);
     // clear();
 
-    for(int i=0;i<MAX+2;i++){
-        for(int j=0;j<MAX+2;j++){
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
             switch (maze[i][j]) {
                 case 0:
                     printf(BLACK);
@@ -192,14 +194,14 @@ void print_maze(int x,int y){
                     break;
             }
             printf(RESET);
-            if(j==MAX+1)printf("\n");
+            if(j==n-1)printf("\n");
         }
     }
     printf(RESET);
 }
 int main(){
     start.x=1;start.y=1;
-    end.x=1;end.y=10;
+    end.x=10;end.y=10;
     astar(start, end);
     print_weight();
     backtracking();
